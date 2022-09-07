@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <stdio.h>
 
 #include "LoadShaders.h"
 
@@ -23,7 +24,7 @@ ReadShader( const char* filename )
 	fopen_s( &infile, filename, "rb" );
 #else
 	FILE* infile;
-	fopen_s(&infile, filename, "rb");
+	// fopen_s(&infile, filename, "rb");
  //   FILE* infile = fopen( filename, "rb" );
 #endif // WIN32
 
