@@ -10,8 +10,9 @@ include_directories(glfw-3.3.8.bin.MACOS/include/GLFW)
 
 add_executable(Computer_Graphics
         glad/glad.c
-        glad/glad.h
-        glad/khrplatform.h
+        LoadShaders.cpp
         glfw-3.3.8.bin.MACOS/include/GLFW/glfw3.h
         glfw-3.3.8.bin.MACOS/include/GLFW/glfw3native.h
-        Main.cpp)
+        glfw-3.3.8.bin.MACOS/lib-x86_64/libglfw3.a
+        homework3.cpp
+        )
