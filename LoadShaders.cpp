@@ -23,9 +23,10 @@ ReadShader( const char* filename )
 	FILE* infile;
 	fopen_s( &infile, filename, "rb" );
 #else
-	FILE* infile;
+	// FILE* infile;
 	// fopen_s(&infile, filename, "rb");
- //   FILE* infile = fopen( filename, "rb" );
+    FILE* infile = fopen(filename, "rb");
+    if (!infile)perror("fopen");
 #endif // WIN32
 
     if ( !infile ) {
