@@ -16,6 +16,7 @@ set(SOURCE_FILES homework3.cpp)
 add_executable(Computer_Graphics
         glad/glad.c
         LoadShaders.cpp
+        objReader.cpp
         homework3.cpp
         )
 # Linking GLFW
