@@ -8,16 +8,18 @@ include_directories(glad)
 # Including GLFW
 add_subdirectory(glfw)
 include_directories(glfw/include)
+
+
 include_directories(passthrough.frag)
 include_directories(passthrough.vert)
 
-set(SOURCE_FILES homework3.cpp)
+set(SOURCE_FILES Project12022.cpp)
 
 add_executable(Computer_Graphics
         glad/glad.c
         LoadShaders.cpp
         objReader.cpp
-        homework3.cpp
+        Project12022.cpp
         )
 # Linking GLFW
 target_link_libraries(Computer_Graphics glfw)

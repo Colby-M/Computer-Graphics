@@ -1,7 +1,6 @@
 #include <glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <string>
 #include <iostream>
 #include <cstdlib>
 #include "LoadShaders.h"
@@ -439,7 +438,7 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
     GLFWwindow* window = nullptr;
-    window = glfwStartUp(argCount, argValues, "Project 1 Base Code -- Your Title Goes Here");
+    window = glfwStartUp(argCount, argValues, "Project 1 Base Code -- 6 objects in a scene");
     init("project1.vert", "project1.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);
 
