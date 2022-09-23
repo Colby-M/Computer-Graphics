@@ -372,7 +372,7 @@ void display() {
 
     // Color
     GLuint colorLocation = glGetUniformLocation(programID, "color");
-    GLfloat Color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // color to draw with -- currently magenta
+    GLfloat Color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // color to draw with -- currently white
     glUniform4fv(colorLocation, 1, Color);
 
     // column 1
@@ -384,18 +384,27 @@ void display() {
     glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
     // column 2
+    Color[0] = 0.0f;
+    Color[1] = 1.0f;
+    Color[2] = 1.0f;
     mat4x4_translate(columnMatrix, -0.5f, -0.5f, -0.5f);
     glUniform4fv(colorLocation, 1, Color);
     glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
     glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
     // column 3
+    Color[0] = 1.0f;
+    Color[1] = 0.0f;
+    Color[2] = 1.0f;
     mat4x4_translate(columnMatrix, -0.5f, -0.5f, 0.5f);
     glUniform4fv(colorLocation, 1, Color);
     glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
     glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
     // column 4
+    Color[0] = 1.0f;
+    Color[1] = 1.0f;
+    Color[2] = 0.0f;
     mat4x4_translate(columnMatrix, 0.5f, -0.5f, 0.5f);
     glUniform4fv(colorLocation, 1, Color);
     glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
@@ -403,6 +412,9 @@ void display() {
 
 
     //  draw the roof
+    Color[0] = 0.0f;
+    Color[1] = 0.0f;
+    Color[2] = 1.0f;
     mat4x4_translate(roofMatrix, 0.0f, 0.5f, 0.0f);
     glUniform4fv(colorLocation, 1, Color);
     glBindVertexArray(vertexBuffers[2]);
@@ -411,7 +423,9 @@ void display() {
     glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[2] * 3);
 
     //  draw a tiger...
-    Color[0] = 0.5f;
+    Color[0] = 0.0f;
+    Color[1] = 1.0f;
+    Color[2] = 0.0f;
     mat4x4_translate(tigerMatrix, 0.0f, -0.5f, 0.0f);
     glBindVertexArray(vertexBuffers[1]);
     glUniform4fv(colorLocation, 1, Color);
