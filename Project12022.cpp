@@ -218,7 +218,7 @@ void buildObjects() {
     glGenBuffers(1, &(arrayBuffers[0]));
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
     GLfloat* normals;
-    GLfloat *vertices = readOBJFile("column.obj", nbrTriangles[0], normals);
+    GLfloat *vertices = readOBJFile("triangulatedAirplane.obj", nbrTriangles[0], normals);
     const int nbrVerticesPerTriangle = 3;
     const int nbrFloatsPerVertex = 4; // x, y, z, w
     const int nbrFloatsPerNormal = 3; // dx, dy, dz
@@ -253,60 +253,31 @@ void buildObjects() {
     //
 
 
-    glGenBuffers(1, &(arrayBuffers[1]));
-    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
-    delete[] normals;
-    delete[] vertices;
-    vertices = readOBJFile("tiger.obj", nbrTriangles[1], normals);
-    verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
-    normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
-    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
-                 NULL, GL_STATIC_DRAW);
-    //                               offset in bytes   size in bytes     ptr to data
-    glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
-    /*
-     * Set up variables into the shader programs (Note:  We need the
-     * shaders loaded and built into a program before we do this)
-     */
-    vPosition = glGetAttribLocation(programID, "vPosition");
-    glEnableVertexAttribArray(vPosition);
-    glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-
-    vNormal = glGetAttribLocation(programID, "vNormal");
-    if (vNormal != -1) {
-        glEnableVertexAttribArray(vNormal);
-        glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
-    }
-
-    // roof
-    glGenVertexArrays(1, &vertexBuffers[2]);
-    glBindVertexArray(vertexBuffers[2]);
-    glGenBuffers(1, &(arrayBuffers[2]));
-    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
-    delete[] normals;
-    delete[] vertices;
-    vertices = readOBJFile("roof.obj", nbrTriangles[2], normals);
-    verticesSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
-    normalsSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
-    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
-                 NULL, GL_STATIC_DRAW);
-    //                               offset in bytes   size in bytes     ptr to data
-    glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
-    /*
-     * Set up variables into the shader programs (Note:  We need the
-     * shaders loaded and built into a program before we do this)
-     */
-    vPosition = glGetAttribLocation(programID, "vPosition");
-    glEnableVertexAttribArray(vPosition);
-    glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-
-    vNormal = glGetAttribLocation(programID, "vNormal");
-    if (vNormal != -1) {
-        glEnableVertexAttribArray(vNormal);
-        glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
-    }
+//    glGenBuffers(1, &(arrayBuffers[1]));
+//    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+//    delete[] normals;
+//    delete[] vertices;
+//    vertices = readOBJFile("tiger.obj", nbrTriangles[1], normals);
+//    verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
+//    normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
+//    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
+//                 NULL, GL_STATIC_DRAW);
+//    //                               offset in bytes   size in bytes     ptr to data
+//    glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
+//    glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
+//    /*
+//     * Set up variables into the shader programs (Note:  We need the
+//     * shaders loaded and built into a program before we do this)
+//     */
+//    vPosition = glGetAttribLocation(programID, "vPosition");
+//    glEnableVertexAttribArray(vPosition);
+//    glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+//
+//    vNormal = glGetAttribLocation(programID, "vNormal");
+//    if (vNormal != -1) {
+//        glEnableVertexAttribArray(vNormal);
+//        glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
+//    }
 }
 
 /*
@@ -362,12 +333,9 @@ void init(string vertexShader, string fragmentShader) {
  * The display routine is basically unchanged at this point.
  */
 void display() {
-    mat4x4 columnMatrix;
-    mat4x4 tigerMatrix;
-    mat4x4 roofMatrix;
+    mat4x4 bridgeMatrix;
 
-    mat4x4_identity(tigerMatrix);
-    mat4x4_identity(roofMatrix);
+    mat4x4_identity(bridgeMatrix);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed -- clears screen before drawing.
 
     // Color
@@ -375,7 +343,7 @@ void display() {
     GLfloat Color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // color to draw with -- currently white
     glUniform4fv(colorLocation, 1, Color);
 
-    // column 1
+    // Airplane
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
     mat4x4_translate(rotation, 0.5f, -0.5f, -0.5f);
     glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)rotation);
@@ -383,55 +351,17 @@ void display() {
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
     glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
-    // column 2
-    Color[0] = 0.0f;
-    Color[1] = 1.0f;
-    Color[2] = 1.0f;
-    mat4x4_translate(columnMatrix, -0.5f, -0.5f, -0.5f);
-    glUniform4fv(colorLocation, 1, Color);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
-    // column 3
-    Color[0] = 1.0f;
-    Color[1] = 0.0f;
-    Color[2] = 1.0f;
-    mat4x4_translate(columnMatrix, -0.5f, -0.5f, 0.5f);
-    glUniform4fv(colorLocation, 1, Color);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
-
-    // column 4
-    Color[0] = 1.0f;
-    Color[1] = 1.0f;
-    Color[2] = 0.0f;
-    mat4x4_translate(columnMatrix, 0.5f, -0.5f, 0.5f);
-    glUniform4fv(colorLocation, 1, Color);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)columnMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
-
-
-    //  draw the roof
-    Color[0] = 0.0f;
-    Color[1] = 0.0f;
-    Color[2] = 1.0f;
-    mat4x4_translate(roofMatrix, 0.0f, 0.5f, 0.0f);
-    glUniform4fv(colorLocation, 1, Color);
-    glBindVertexArray(vertexBuffers[2]);
-    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)roofMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[2] * 3);
-
-    //  draw a tiger...
-    Color[0] = 0.0f;
-    Color[1] = 1.0f;
-    Color[2] = 0.0f;
-    mat4x4_translate(tigerMatrix, 0.0f, -0.5f, 0.0f);
-    glBindVertexArray(vertexBuffers[1]);
-    glUniform4fv(colorLocation, 1, Color);
-    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)tigerMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
+    //  Bridge
+//    Color[0] = 0.0f;
+//    Color[1] = 0.0f;
+//    Color[2] = 1.0f;
+//    mat4x4_translate(bridgeMatrix, 0.0f, 0.5f, 0.0f);
+//    glUniform4fv(colorLocation, 1, Color);
+//    glBindVertexArray(vertexBuffers[1]);
+//    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)bridgeMatrix);
+//    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
 
 }
 
