@@ -253,31 +253,31 @@ void buildObjects() {
     //
 
 
-//    glGenBuffers(1, &(arrayBuffers[1]));
-//    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
-//    delete[] normals;
-//    delete[] vertices;
-//    vertices = readOBJFile("tiger.obj", nbrTriangles[1], normals);
-//    verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
-//    normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
-//    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
-//                 NULL, GL_STATIC_DRAW);
-//    //                               offset in bytes   size in bytes     ptr to data
-//    glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
-//    glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
-//    /*
-//     * Set up variables into the shader programs (Note:  We need the
-//     * shaders loaded and built into a program before we do this)
-//     */
-//    vPosition = glGetAttribLocation(programID, "vPosition");
-//    glEnableVertexAttribArray(vPosition);
-//    glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-//
-//    vNormal = glGetAttribLocation(programID, "vNormal");
-//    if (vNormal != -1) {
-//        glEnableVertexAttribArray(vNormal);
-//        glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
-//    }
+    glGenBuffers(1, &(arrayBuffers[1]));
+    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+    delete[] normals;
+    delete[] vertices;
+    vertices = readOBJFile("goldenGateTriangulated.obj", nbrTriangles[1], normals);
+    verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
+    normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
+    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
+                 NULL, GL_STATIC_DRAW);
+    //                               offset in bytes   size in bytes     ptr to data
+    glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
+    /*
+     * Set up variables into the shader programs (Note:  We need the
+     * shaders loaded and built into a program before we do this)
+     */
+    vPosition = glGetAttribLocation(programID, "vPosition");
+    glEnableVertexAttribArray(vPosition);
+    glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+    vNormal = glGetAttribLocation(programID, "vNormal");
+    if (vNormal != -1) {
+        glEnableVertexAttribArray(vNormal);
+        glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
+    }
 }
 
 /*
@@ -345,7 +345,7 @@ void display() {
 
     // Airplane
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
-    mat4x4_translate(rotation, 0.5f, -0.5f, -0.5f);
+    mat4x4_translate(rotation, 0.0f, 0.0f, 0.0f);
     glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)rotation);
     glBindVertexArray(vertexBuffers[0]);
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
@@ -353,15 +353,16 @@ void display() {
 
 
     //  Bridge
-//    Color[0] = 0.0f;
-//    Color[1] = 0.0f;
-//    Color[2] = 1.0f;
-//    mat4x4_translate(bridgeMatrix, 0.0f, 0.5f, 0.0f);
-//    glUniform4fv(colorLocation, 1, Color);
-//    glBindVertexArray(vertexBuffers[1]);
-//    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
-//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)bridgeMatrix);
-//    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
+    Color[0] = 0.0f;
+    Color[1] = 0.0f;
+    Color[2] = 1.0f;
+    mat4x4_translate(bridgeMatrix, 0.0f, 0.0f, 0.0f);
+    glUniform4fv(colorLocation, 1, Color);
+    glBindVertexArray(vertexBuffers[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+    mat4x4_rotate_Y(bridgeMatrix,bridgeMatrix,90.0f);
+    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)bridgeMatrix);
+    glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
 
 }
 
