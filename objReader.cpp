@@ -130,7 +130,7 @@ float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
 				triangleVertices[i * 12 + j * 4 + k] = (vertices[triangle[j]])[k];
 			}
 		}
-//		delete[] triangle;
+		delete[] triangle;
 //		delete[] triangleNormal;
 	}
 	/*
