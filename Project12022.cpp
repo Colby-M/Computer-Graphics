@@ -7,7 +7,6 @@
 #include "linmath.h"
 #include <map>
 #include <vector>
-#include "OBJDrawable.h"
 using namespace std;
 /*
  * Computer Graphics I -- Project 1 -- Base Code.
@@ -356,7 +355,7 @@ float zTransform(double time) {
 void display() {
     mat4x4 airplaneMatrix;
     mat4x4 bridgeMatrix;
-
+    // can use either interpolation using these arrays, or just use the functions themselves, functions make it smooth
     float xTransforms[] {1,0.9510,0.8090, 0.5877, 0.30901, 0, -0.30901, -0.58778, -0.80901, -0.95105, -1, -0.95105, -0.809016, -0.587785, -0.309016, 0, 0.309016, 0.587785, 0.809016, 0.951056, 1};
     float yTransforms[] {0,-0.77254, -1.469463, -2.02254, -2.37764, -2.5, -2.37764, -2.02254, -1.46946, -0.772542, 0, 0.77254, 1.469463, 2.02254, 2.37764, 2.5, 2.37764, 2.02254, 1.46943, 0.77254, 0};
     float zTransforms[] {0,0.587785, 0.951056, 0.951056, 0.587785, 0, -0.587785, -0.951056, -0.951056, -0.587785, 0,0.587785, 0.951056, 0.951056, 0.587785, 0, -0.587785, -0.951056, -0.951056, -0.587785, 0};
@@ -372,7 +371,7 @@ void display() {
 
     // Airplane
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
-    mat4x4_translate(airplaneMatrix, xTransform(glfwGetTime()), yTransform(glfwGetTime()), zTransform(glfwGetTime()));
+    mat4x4_translate(airplaneMatrix, xTransform(glfwGetTime() / 5), yTransform(glfwGetTime() / 5), zTransform(glfwGetTime() / 5));
     glUniform4fv(colorLocation, 1, Color);
     glBindVertexArray(vertexBuffers[0]);
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
@@ -411,15 +410,11 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 int main(int argCount, char* argValues[]) {
     GLFWwindow* window = nullptr;
     window = glfwStartUp(argCount, argValues, "Project 2 -- Plane moving around bridge");
-    init("project1.vert", "project1.frag");
+    init("project2.vert", "project1.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);
-    //OBJDrawable airplaneDraw = OBJDrawable("triangulatedAirplane.obj", programID);
-    //OBJDrawable bridgeDraw = OBJDrawable("GoldenGateTriangulatedRotated.obj", programID, "vPosition", "vNormal");
 
     while (!glfwWindowShouldClose(window))
     {
-        //airplaneDraw.display();
-        //bridgeDraw.display();
         display();
 
         glfwSwapBuffers(window);
