@@ -66,9 +66,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 
     static float currentAngle = 0.0;
-    //static float currentLimit = 1.0;
     mat4x4 viewingMatrix;
-    //mat4x4 projectionMatrix;
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -109,20 +107,27 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
-//    else if (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
-//        currentLimit = currentLimit * 2;
-//        mat4x4_ortho(projectionMatrix, -currentLimit, currentLimit, -currentLimit, currentLimit, -100.0f, 100.0f);
-//        GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
-//        glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
-//
-//    }
-//    else if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
-//        currentLimit = currentLimit / 2;
-//        mat4x4_ortho(projectionMatrix, -currentLimit, currentLimit, -currentLimit, currentLimit, -100.0f, 100.0f);
-//        GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
-//        glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
-//
-//    }
+    else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+        mat4x4_look_at(viewingMatrix, vec3 {-5.0f, 0.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+        glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+    }
+    else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
+        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 1.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+        glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+    }
+    else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 0.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+        glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+    }
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        // reset to what was originally put
+        mat4x4_look_at(viewingMatrix, vec3 {5.0f, -1.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+        glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+    }
 
 }
 
@@ -313,6 +318,28 @@ void getLocations() {
     }
 }
 
+void lightingSetup()
+{
+    GLfloat shininess[] = { 25.0f };
+    GLfloat lightColor[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+    GLfloat lightDirection[] = { 0.0f, 0.7071f, 0.7071f };
+    GLfloat ambientLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat halfVector[] = { 0.0f, 0.3827f, 0.3827f };
+    GLfloat ambientColor[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+    GLuint shininessLoc = glGetUniformLocation(programID, "shininess");
+    GLuint lightColorLoc = glGetUniformLocation(programID, "lightColor");
+    GLuint lightDirectionLoc = glGetUniformLocation(programID, "lightDirection");
+    GLuint ambientLightLoc = glGetUniformLocation(programID, "ambientLight");
+    GLuint halfVectorLoc = glGetUniformLocation(programID, "halfVector");
+    GLuint ambientColorLoc = glGetUniformLocation(programID, "ambientColor");
+    glUniform1fv(shininessLoc, 1, shininess);
+    glUniform4fv(lightColorLoc, 1, lightColor);
+    glUniform3fv(lightDirectionLoc, 1, lightDirection);
+    glUniform4fv(ambientLightLoc, 1, ambientLight);
+    glUniform3fv(halfVectorLoc, 1, halfVector);
+    glUniform4fv(ambientColorLoc, 1, ambientColor);
+}
+
 void init(string vertexShader, string fragmentShader) {
 
     setAttributes(1.0f, GL_FRONT_AND_BACK, GL_FILL);
@@ -323,36 +350,62 @@ void init(string vertexShader, string fragmentShader) {
     buildObjects();
 
     getLocations();
-    // Originally set the viewing, projection, and modeling matrices to the identity matrix
+    // Set up the matrices and attributes
     //
+    // matrix setup
+    GLuint viewingMatrixLoc = glGetUniformLocation(programID, "viewingMatrix");
+    GLuint projectionMatrixLoc = glGetUniformLocation(programID, "projectionMatrix");
+    GLuint modelingMatrixLoc = glGetUniformLocation(programID, "modelingMatrix");
+    GLuint normalMatrixLoc = glGetUniformLocation(programID, "normalMatrix");
+    glUniformMatrix4fv(viewingMatrixLoc, 1, false, (const GLfloat*)rotation);
+    glUniformMatrix4fv(projectionMatrixLoc, 1, false, (const GLfloat*)rotation);
+    glUniformMatrix4fv(modelingMatrixLoc, 1, false, (const GLfloat*)rotation);
+    glUniformMatrix4fv(normalMatrixLoc, 1, false, (const GLfloat*)rotation);
+
+    // normal matrix setup
+    mat4x4 nMat;
+    mat4x4 nMat2;
     mat4x4 projectionMatrix;
     mat4x4 viewingMatrix;
+    mat4x4 normalMatrix;
+    mat4x4_identity(projectionMatrix);
+    mat4x4_identity(viewingMatrix);
+    mat4x4_identity(normalMatrix);
+
+    // changing view into a perspective
     vec3 eyePoint = { 5.0f, -1.0f, -5.0f};
     vec3 upVector = { 0.0f, -1.0f, 0.0f };
     vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
     mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
     mat4x4_perspective(projectionMatrix, 80.0f, 1.0f, 0.01f, 10000.0f);
-    glUniformMatrix4fv(locationMap["viewingMatrix"], 1, false, (const GLfloat*)rotation);
-    glUniformMatrix4fv(locationMap["projectionMatrix"], 1, false, (const GLfloat*)rotation);
-    glUniformMatrix4fv(locationMap["modelingMatrix"], 1, false, (const GLfloat*)rotation);
+
     GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
     glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
     glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+    // normal matrix is viewing matrix * modeling matrix, then invert and transpose
+    mat4x4_mul(nMat, viewingMatrix, projectionMatrix);
+    mat4x4_invert(nMat2, nMat);
+    mat4x4_transpose(normalMatrix, nMat2);
+    GLuint normalMatrixLocation = glGetUniformLocation(programID, "normalMatrix");
+    glUniformMatrix4fv(normalMatrixLocation, 1, false, (const GLfloat*)normalMatrix);
+
+    // light set up
+    lightingSetup();
 }
 float xTransform(double time) {
-    return cos(time * 2 * M_PI);
+    return (float)cos(time * 2 * M_PI);
 }
 float yTransform(double time) {
-    return 2.5 * cos((time) * 2 * M_PI + (M_PI/2)) + 2.7;
+    return 2.5 * (float)cos((time) * 2 * M_PI + (M_PI/2)) + 2.7;
 }
 float zTransform(double time) {
-    return sin(2 * (time) * 2 * M_PI);
+    return (float)sin(2 * (time) * 2 * M_PI);
 }
 /*
  * The display routine is basically unchanged at this point.
  */
-void display() {
+void display(float time) {
     mat4x4 airplaneMatrix;
     mat4x4 bridgeMatrix;
     // can use either interpolation using these arrays, or just use the functions themselves, functions make it smooth
@@ -365,13 +418,15 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed -- clears screen before drawing.
 
     // Color
-    GLuint colorLocation = glGetUniformLocation(programID, "color");
+    GLuint colorLocation = glGetUniformLocation(programID, "objectColor");
     GLfloat Color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // color to draw with -- currently white
     glUniform4fv(colorLocation, 1, Color);
 
     // Airplane
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
+    // scale and move the airplane
     mat4x4_translate(airplaneMatrix, xTransform(glfwGetTime() / 5), yTransform(glfwGetTime() / 5), zTransform(glfwGetTime() / 5));
+    mat4x4_scale_aniso(airplaneMatrix, airplaneMatrix, 0.5f, 0.5f, 0.5f);
     glUniform4fv(colorLocation, 1, Color);
     glBindVertexArray(vertexBuffers[0]);
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
@@ -380,9 +435,9 @@ void display() {
 
 
     //  Bridge
-    Color[0] = 0.0f;
+    Color[0] = 0.8f;
     Color[1] = 0.0f;
-    Color[2] = 1.0f;
+    Color[2] = 0.0f;
     mat4x4_translate(bridgeMatrix, 0.0f, 0.0f, 0.0f);
     glUniform4fv(colorLocation, 1, Color);
     glBindVertexArray(vertexBuffers[1]);
@@ -410,12 +465,19 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 int main(int argCount, char* argValues[]) {
     GLFWwindow* window = nullptr;
     window = glfwStartUp(argCount, argValues, "Project 2 -- Plane moving around bridge");
-    init("project2.vert", "project1.frag");
+    init("project2.vert", "project2.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);
+    float time = 0;
 
     while (!glfwWindowShouldClose(window))
     {
-        display();
+        if(time > 1)
+        {
+            time = 0;
+        }else {
+            time += 0.5;
+        }
+        display(time);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
