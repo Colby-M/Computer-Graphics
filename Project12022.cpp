@@ -9,12 +9,8 @@
 #include <vector>
 using namespace std;
 /*
- * Computer Graphics I -- Project 1 -- Base Code.
- * Name:
- *
- * This code is a framework/starting point for project 1 in the course.
- * you may feel free to use and modify this code for the project (in
- * fact I strongly suggest it!)
+ * Computer Graphics I -- Project 2
+ * Name: Colby McDonald
  *
  */
 
@@ -67,6 +63,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
     static float currentAngle = 0.0;
     mat4x4 viewingMatrix;
+    static float currentFOV = M_PI/4.0;
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -74,7 +71,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
         currentAngle += 3.14159 / 18;  // 10 degrees
         vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
-        vec3 upVector = { 0.0f, -1.0f, 0.0f };
+        vec3 upVector = { 0.0f, 1.0f, 0.0f };
         vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
         mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
@@ -83,7 +80,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     else if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS) {
         currentAngle += 3.14159 / 18;  // 10 degrees
         vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
-        vec3 upVector = { 0.0f, -1.0f, 0.0f };
+        vec3 upVector = { 0.0f, 1.0f, 0.0f };
         vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
         mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
@@ -92,7 +89,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
         currentAngle -= 3.14159 / 18;  // 10 degrees
         vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
-        vec3 upVector = { 0.0f, -1.0f, 0.0f };
+        vec3 upVector = { 0.0f, 1.0f, 0.0f };
         vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
         mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
@@ -101,30 +98,52 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     else if (key == GLFW_KEY_COMMA && action == GLFW_PRESS) {
         currentAngle -= 3.14159 / 18;  // 10 degrees
         vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
-        vec3 upVector = { 0.0f, -1.0f, 0.0f };
+        vec3 upVector = { 0.0f, 1.0f, 0.0f };
         vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
         mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
+    else if (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
+        if (currentFOV <= M_PI/6.0){
+            return;
+        }
+        currentFOV -= 3.14159 / 18;
+        mat4x4 projectionMatrix;
+        mat4x4_identity(projectionMatrix);
+        mat4x4_perspective(projectionMatrix, currentFOV, 1.0f, 0.01f, 10000.0f);
+        GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+    }
+    else if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
+        if (currentFOV >=  M_PI/3.0){
+            return;
+        }
+        currentFOV += 3.14159 / 18;
+        mat4x4 projectionMatrix;
+        mat4x4_identity(projectionMatrix);
+        mat4x4_perspective(projectionMatrix, currentFOV, 1.0f, 0.01f, 10000.0f);
+        GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+    }
     else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-        mat4x4_look_at(viewingMatrix, vec3 {-5.0f, 0.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        mat4x4_look_at(viewingMatrix, vec3 {-5.0f, 0.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
     else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 1.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 1.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
     else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 0.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 0.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
     else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
         // reset to what was originally put
-        mat4x4_look_at(viewingMatrix, vec3 {5.0f, -1.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, -1.0f, 0.0f});
+        mat4x4_look_at(viewingMatrix, vec3 {5.0f, -1.0f, -5.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
@@ -374,10 +393,10 @@ void init(string vertexShader, string fragmentShader) {
 
     // changing view into a perspective
     vec3 eyePoint = { 5.0f, -1.0f, -5.0f};
-    vec3 upVector = { 0.0f, -1.0f, 0.0f };
+    vec3 upVector = { 0.0f, 1.0f, 0.0f };
     vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
     mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
-    mat4x4_perspective(projectionMatrix, 80.0f, 1.0f, 0.01f, 10000.0f);
+    mat4x4_perspective(projectionMatrix, M_PI/4.0, 1.0f, 0.01f, 10000.0f);
 
     GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
     glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
