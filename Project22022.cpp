@@ -132,7 +132,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
     else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 1.0f, 0.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
+        mat4x4_look_at(viewingMatrix, vec3 {0.0f, 5.0f, 1.0f}, vec3 { 0.0f, 0.0f, 0.0f }, vec3{0.0f, 1.0f, 0.0f});
         GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
         glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
     }
