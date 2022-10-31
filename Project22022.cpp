@@ -416,7 +416,7 @@ float xTransform(double time) {
     return (float)cos(time * 2 * M_PI);
 }
 float yTransform(double time) {
-    return 2.5 * (float)cos((time) * 2 * M_PI + (M_PI/2)) + 2.7;
+    return 2.5f * (float)cos((time) * 2 * M_PI + (M_PI/2)) + 2.7;
 }
 float zTransform(double time) {
     return (float)sin(2 * (time) * 2 * M_PI);
@@ -424,13 +424,11 @@ float zTransform(double time) {
 /*
  * The display routine is basically unchanged at this point.
  */
-void display(float time) {
+void display(int time) {
     mat4x4 airplaneMatrix;
     mat4x4 bridgeMatrix;
-    // can use either interpolation using these arrays, or just use the functions themselves, functions make it smooth
-    float xTransforms[] {1,0.9510,0.8090, 0.5877, 0.30901, 0, -0.30901, -0.58778, -0.80901, -0.95105, -1, -0.95105, -0.809016, -0.587785, -0.309016, 0, 0.309016, 0.587785, 0.809016, 0.951056, 1};
-    float yTransforms[] {0,-0.77254, -1.469463, -2.02254, -2.37764, -2.5, -2.37764, -2.02254, -1.46946, -0.772542, 0, 0.77254, 1.469463, 2.02254, 2.37764, 2.5, 2.37764, 2.02254, 1.46943, 0.77254, 0};
-    float zTransforms[] {0,0.587785, 0.951056, 0.951056, 0.587785, 0, -0.587785, -0.951056, -0.951056, -0.587785, 0,0.587785, 0.951056, 0.951056, 0.587785, 0, -0.587785, -0.951056, -0.951056, -0.587785, 0};
+    float transforms[] = {0, 0.05009, 0.087279, 0.117984, 0.145309, 0.160683, 0.190321, 0.206747, 0.228801, 0.250855, 0.270645, 0.290468, 0.315457, 0.335301, 0.365466, 0.387592, 0.425402, 0.466666, 0.505349, 0.55417, 0.591382, 0.620997, 0.648321, 0.670699, 0.692753, 0.713309, 0.733131, 0.752957, 0.772801, 0.792645, 0.813925, 0.83605, 0.860151, 0.887622, 0.920584, 0.960803};
+    // can use either interpolation using the array, or just use the functions themselves, functions make it smooth
 
     mat4x4_identity(airplaneMatrix);
     mat4x4_identity(bridgeMatrix);
@@ -444,7 +442,7 @@ void display(float time) {
     // Airplane
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
     // scale and move the airplane
-    mat4x4_translate(airplaneMatrix, xTransform(glfwGetTime() / 5), yTransform(glfwGetTime() / 5), zTransform(glfwGetTime() / 5));
+    mat4x4_translate(airplaneMatrix, xTransform(transforms[time]), yTransform(transforms[time]), zTransform(transforms[time]));
     mat4x4_scale_aniso(airplaneMatrix, airplaneMatrix, 0.5f, 0.5f, 0.5f);
     glUniform4fv(colorLocation, 1, Color);
     glBindVertexArray(vertexBuffers[0]);
@@ -486,20 +484,24 @@ int main(int argCount, char* argValues[]) {
     window = glfwStartUp(argCount, argValues, "Project 2 -- Plane moving around bridge");
     init("project2.vert", "project2.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);
-    float time = 0;
+    int time = 0;
+    int slowDown = 0;
 
     while (!glfwWindowShouldClose(window))
     {
-        if(time > 1)
-        {
-            time = 0;
-        }else {
-            time += 0.5;
+        if(slowDown > 10) {
+            slowDown = 0;
+            if (time > 35) {
+                time = 0;
+            } else {
+                time++;
+            }
         }
         display(time);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+        slowDown ++;
     };
 
     glfwDestroyWindow(window);
