@@ -74,6 +74,13 @@ build CMakeFiles/Computer_Graphics.dir/Project22022.cpp.o: CXX_COMPILER__Compute
   OBJECT_DIR = CMakeFiles/Computer_Graphics.dir
   OBJECT_FILE_DIR = CMakeFiles/Computer_Graphics.dir
 
+build CMakeFiles/Computer_Graphics.dir/Particles.cpp.o: CXX_COMPILER__Computer_Graphics_Debug /Users/Colby/Desktop/OpenGL/Computer-Graphics/Particles.cpp || cmake_object_order_depends_target_Computer_Graphics
+  DEP_FILE = CMakeFiles/Computer_Graphics.dir/Particles.cpp.o.d
+  FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk -mmacosx-version-min=11.6 -std=gnu++14
+  INCLUDES = -I/Users/Colby/Desktop/OpenGL/Computer-Graphics/glad -I/Users/Colby/Desktop/OpenGL/Computer-Graphics/glfw/include -I/Users/Colby/Desktop/OpenGL/Computer-Graphics/passthrough.frag -I/Users/Colby/Desktop/OpenGL/Computer-Graphics/passthrough.vert
+  OBJECT_DIR = CMakeFiles/Computer_Graphics.dir
+  OBJECT_FILE_DIR = CMakeFiles/Computer_Graphics.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Computer_Graphics
@@ -82,7 +89,7 @@ build CMakeFiles/Computer_Graphics.dir/Project22022.cpp.o: CXX_COMPILER__Compute
 #############################################
 # Link the executable Computer_Graphics
 
-build Computer_Graphics: CXX_EXECUTABLE_LINKER__Computer_Graphics_Debug CMakeFiles/Computer_Graphics.dir/glad/glad.c.o CMakeFiles/Computer_Graphics.dir/LoadShaders.cpp.o CMakeFiles/Computer_Graphics.dir/objReader.cpp.o CMakeFiles/Computer_Graphics.dir/Project22022.cpp.o | glfw/src/libglfw3.a || glfw/src/libglfw3.a
+build Computer_Graphics: CXX_EXECUTABLE_LINKER__Computer_Graphics_Debug CMakeFiles/Computer_Graphics.dir/glad/glad.c.o CMakeFiles/Computer_Graphics.dir/LoadShaders.cpp.o CMakeFiles/Computer_Graphics.dir/objReader.cpp.o CMakeFiles/Computer_Graphics.dir/Project22022.cpp.o CMakeFiles/Computer_Graphics.dir/Particles.cpp.o | glfw/src/libglfw3.a || glfw/src/libglfw3.a
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk -mmacosx-version-min=11.6
   LINK_LIBRARIES = glfw/src/libglfw3.a  -framework Cocoa  -framework IOKit  -framework CoreFoundation
   OBJECT_DIR = CMakeFiles/Computer_Graphics.dir

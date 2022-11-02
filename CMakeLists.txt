@@ -20,6 +20,7 @@ add_executable(Computer_Graphics
         LoadShaders.cpp
         objReader.cpp
         Project22022.cpp
+        Particles.cpp
         )
 # Linking GLFW
 target_link_libraries(Computer_Graphics glfw)
