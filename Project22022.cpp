@@ -162,7 +162,7 @@ void setAttributes(float lineWidth, GLenum face, GLenum fill) {
 
 void buildObjects() {
 
-    myParticleSystem.init(100);
+    myParticleSystem.init(1000);
     glGenVertexArrays(1, vertexBuffers);
     glBindVertexArray(vertexBuffers[0]);
 
@@ -244,7 +244,8 @@ void init(string vertexShader, string fragmentShader) {
     programID = buildProgram(vertexShader, fragmentShader);
     mat4x4_identity(rotation);
     mat4x4_identity(viewMatrix);
-    mat4x4_ortho(projectionMatrix, -10.0f, 10.0f, -10.0f, 10.0f, -100.0f, 100.0f);
+    mat4x4_look_at(viewMatrix, vec3{ 1.0f, -1.0f, 1.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+    mat4x4_perspective(projectionMatrix, (60 * M_PI)/180, 1.0f, -5.0f, 5.0f);
     buildObjects();
     getLocations();
 }
@@ -273,7 +274,7 @@ void SetUpDirectionalLighting()
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-    myParticleSystem.generate(10);
+    myParticleSystem.generate(1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
     mat4x4 translation, mTransform;
@@ -360,20 +361,11 @@ int main(int argCount, char* argValues[]) {
     init("passthrough.vert", "directional.frag");
 //	init("pointsource.vert", "pointsource.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);
-    int slowDown = 0;
     while (!glfwWindowShouldClose(window))
     {
-        if (slowDown > 5)
-        {
-            displayDirectional();
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-            slowDown = 0;
-        }
-        else
-        {
-            slowDown++;
-        }
+        displayDirectional();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     };
 
 
