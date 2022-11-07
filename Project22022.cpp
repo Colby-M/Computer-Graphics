@@ -10,7 +10,7 @@
 #include "Particles.h"
 using namespace std;
 /*
- * Computer Graphics I -- Project 2
+ * Computer Graphics I -- Project 3
  * Name: Colby McDonald
  *
  */
@@ -69,17 +69,23 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-        mat4x4_rotate_Y(rotation, rotation, 0.31419);
-    }
-    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-        mat4x4_rotate_Y(rotation, rotation, -0.31419);
-    }
+//    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+//        mat4x4_rotate_Y(rotation, rotation, 0.31419);
+//    }
+//    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+//        mat4x4_rotate_Y(rotation, rotation, -0.31419);
+//    }
     else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-        mat4x4_look_at(viewMatrix, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        mat4x4_look_at(viewMatrix, vec3{ 10.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
     }
     else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-        mat4x4_look_at(viewMatrix, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 1.0f });
+        mat4x4_look_at(viewMatrix, vec3{ 0.0f, 20.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, -1.0f });
+    }
+    else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 0.0f, 0.0f, -10.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+    }
+    else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
     }
 }
 
@@ -244,8 +250,8 @@ void init(string vertexShader, string fragmentShader) {
     programID = buildProgram(vertexShader, fragmentShader);
     mat4x4_identity(rotation);
     mat4x4_identity(viewMatrix);
-    mat4x4_look_at(viewMatrix, vec3{ 1.0f, -1.0f, 1.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-    mat4x4_perspective(projectionMatrix, (60 * M_PI)/180, 1.0f, -5.0f, 5.0f);
+    mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, -10.0f, 10.0f);
     buildObjects();
     getLocations();
 }
@@ -274,7 +280,7 @@ void SetUpDirectionalLighting()
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-    myParticleSystem.generate(1);
+    myParticleSystem.generate(4);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
     mat4x4 translation, mTransform;
@@ -357,7 +363,7 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
     GLFWwindow* window = nullptr;
-    window = glfwStartUp(argCount, argValues, "Lighting Demo");
+    window = glfwStartUp(argCount, argValues, "Snowflakes - Project 3");
     init("passthrough.vert", "directional.frag");
 //	init("pointsource.vert", "pointsource.frag");
     glfwSetWindowSizeCallback(window, reshapeWindow);

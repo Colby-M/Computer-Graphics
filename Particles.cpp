@@ -21,16 +21,16 @@ void FountainParticles::generate(int maxNewParticles)
 {
 	if (maxNewParticles + nbrOfParticles < maxParticles) { // generate the particles
 		for (int currentParticle = 0; currentParticle < maxNewParticles; ++currentParticle) {
-			positions[(nbrOfParticles + currentParticle) * 3] = placementDistribution(generator) * 2.0 - 1.0;;
-			positions[(nbrOfParticles + currentParticle) * 3 + 1] = 1.0f;
-			positions[(nbrOfParticles + currentParticle) * 3 + 2] = placementDistribution(generator) * 2.0 - 1.0;;
+			positions[(nbrOfParticles + currentParticle) * 3] = placementDistribution(generator) * 5.0 - 5.0;
+			positions[(nbrOfParticles + currentParticle) * 3 + 1] = 12.0f;
+			positions[(nbrOfParticles + currentParticle) * 3 + 2] = placementDistribution(generator) * 5.0 - 5.0;
 			
 			velocities[(nbrOfParticles + currentParticle) * 3] = 0;
 			velocities[(nbrOfParticles + currentParticle) * 3 + 1] = 0;
 			velocities[(nbrOfParticles + currentParticle) * 3 + 2] = 0;
 
 			accelerations[(nbrOfParticles + currentParticle) * 3] = 0.0;
-			accelerations[(nbrOfParticles + currentParticle) * 3 + 1] = -1.0;
+			accelerations[(nbrOfParticles + currentParticle) * 3 + 1] = -0.2;
 			accelerations[(nbrOfParticles + currentParticle) * 3 + 2] = 0.0;
 
 			orientations[(nbrOfParticles + currentParticle) * 4] = 1.0;
@@ -54,7 +54,11 @@ void FountainParticles::update(float timeStep)
 			newPosition[i] = positions[current + i] + velocities[current + i] * timeStep + accelerations[current + i] * timeStep * timeStep / 2.0f;
 		}
 		for (int i = 0; i < 3; i++) {
-			newVelocity[i] = velocities[current + i] + accelerations[current + i] * timeStep;
+            float newVelo = velocities[current + i] + accelerations[current + i] * timeStep;
+            // checks for terminal velocity
+            if (newVelo < 5.0f) {
+                newVelocity[i] = newVelo;
+            }
 		}
 		for (int i = 0; i < 3; i++) {
 			positions[current + i] = newPosition[i];
