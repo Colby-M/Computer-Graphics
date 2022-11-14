@@ -176,7 +176,7 @@ void buildObjects() {
  * Read object in from obj file.
  */
     GLfloat *cowVertices= nullptr, *cowNormals=nullptr;
-    cowVertices = readOBJFile("roof.obj", nbrTriangles, cowNormals);
+    cowVertices = readOBJFile("snowflake.obj", nbrTriangles, cowNormals);
     glGenBuffers(1, &(arrayBuffers[0]));
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
     GLuint cowVerticesSize = nbrTriangles * 3.0 * 4.0 * sizeof(GLfloat);
@@ -249,9 +249,8 @@ void init(string vertexShader, string fragmentShader) {
 
     programID = buildProgram(vertexShader, fragmentShader);
     mat4x4_identity(rotation);
-    mat4x4_identity(viewMatrix);
     mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, -10.0f, 10.0f);
+    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, -20.0f, 20.0f);
     buildObjects();
     getLocations();
 }
