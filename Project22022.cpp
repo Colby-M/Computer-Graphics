@@ -66,6 +66,7 @@ static void error_callback(int error, const char* description)
  */
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    static float currentFOV = M_PI_4;
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
@@ -168,7 +169,7 @@ void setAttributes(float lineWidth, GLenum face, GLenum fill) {
 
 void buildObjects() {
 
-    myParticleSystem.init(1000);
+    myParticleSystem.init(10000);
     glGenVertexArrays(1, vertexBuffers);
     glBindVertexArray(vertexBuffers[0]);
 
@@ -176,7 +177,7 @@ void buildObjects() {
  * Read object in from obj file.
  */
     GLfloat *cowVertices= nullptr, *cowNormals=nullptr;
-    cowVertices = readOBJFile("snowflake.obj", nbrTriangles, cowNormals);
+    cowVertices = readOBJFile("roof.obj", nbrTriangles, cowNormals);
     glGenBuffers(1, &(arrayBuffers[0]));
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
     GLuint cowVerticesSize = nbrTriangles * 3.0 * 4.0 * sizeof(GLfloat);
@@ -249,6 +250,7 @@ void init(string vertexShader, string fragmentShader) {
 
     programID = buildProgram(vertexShader, fragmentShader);
     mat4x4_identity(rotation);
+    mat4x4_identity(viewMatrix);
     mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
     mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, -20.0f, 20.0f);
     buildObjects();
@@ -279,13 +281,9 @@ void SetUpDirectionalLighting()
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-    myParticleSystem.generate(4);
+    myParticleSystem.generate(5);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
-    mat4x4 translation, mTransform;
-    mat4x4_translate(translation, 3.0f* sin(currentT * 2.0 * 3.14159f), 0.0f, 2.0f*cos(currentT * 2.0 * 3.14159f));
-    mat4x4_mul(mTransform, translation, rotation);
-    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)mTransform);
     GLuint viewMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, false, (const GLfloat*)viewMatrix);
     GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");

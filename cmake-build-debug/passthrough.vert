@@ -9,6 +9,7 @@ uniform mat4 viewingMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 
+
 in vec4 vColor;
 in vec4 vPosition;
 in vec3 vNormal;
@@ -19,6 +20,10 @@ out vec3 Normal;
 void main()
 {
 	Color = vColor;
-	Normal = vNormal;
-    gl_Position = modelingMatrix * vPosition;
+	Normal = normalize(normalMatrix*vNormal);
+
+    gl_Position = projectionMatrix * 
+	viewingMatrix * 
+	modelingMatrix * 
+	vPosition;
 }
