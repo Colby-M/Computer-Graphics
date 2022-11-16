@@ -30,7 +30,7 @@ void FountainParticles::generate(int maxNewParticles)
 			velocities[(nbrOfParticles + currentParticle) * 3 + 2] = 0;
 
 			accelerations[(nbrOfParticles + currentParticle) * 3] = 0.0;
-			accelerations[(nbrOfParticles + currentParticle) * 3 + 1] = -0.2;
+			accelerations[(nbrOfParticles + currentParticle) * 3 + 1] = -32.2;
 			accelerations[(nbrOfParticles + currentParticle) * 3 + 2] = 0.0;
 
 			orientations[(nbrOfParticles + currentParticle) * 4] = 1.0;
@@ -54,11 +54,7 @@ void FountainParticles::update(float timeStep)
 			newPosition[i] = positions[current + i] + velocities[current + i] * timeStep + accelerations[current + i] * timeStep * timeStep / 2.0f;
 		}
 		for (int i = 0; i < 3; i++) {
-            float newVelo = velocities[current + i] + accelerations[current + i] * timeStep;
-            // checks for terminal velocity
-            if (newVelo < 5.0f) {
-                newVelocity[i] = newVelo;
-            }
+            newVelocity[i] = velocities[current + i] + accelerations[current + i] * timeStep;
 		}
 		for (int i = 0; i < 3; i++) {
 			positions[current + i] = newPosition[i];

@@ -169,7 +169,7 @@ void setAttributes(float lineWidth, GLenum face, GLenum fill) {
 
 void buildObjects() {
 
-    myParticleSystem.init(10000);
+    myParticleSystem.init(100);
     glGenVertexArrays(1, vertexBuffers);
     glBindVertexArray(vertexBuffers[0]);
 
@@ -177,7 +177,7 @@ void buildObjects() {
  * Read object in from obj file.
  */
     GLfloat *cowVertices= nullptr, *cowNormals=nullptr;
-    cowVertices = readOBJFile("roof.obj", nbrTriangles, cowNormals);
+    cowVertices = readOBJFile("snowflake.obj", nbrTriangles, cowNormals);
     glGenBuffers(1, &(arrayBuffers[0]));
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
     GLuint cowVerticesSize = nbrTriangles * 3.0 * 4.0 * sizeof(GLfloat);
@@ -252,7 +252,7 @@ void init(string vertexShader, string fragmentShader) {
     mat4x4_identity(rotation);
     mat4x4_identity(viewMatrix);
     mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, -20.0f, 20.0f);
+    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, 0.01f, 100.0f);
     buildObjects();
     getLocations();
 }
@@ -281,7 +281,7 @@ void SetUpDirectionalLighting()
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-    myParticleSystem.generate(5);
+    myParticleSystem.generate(1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
     GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
     GLuint viewMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
@@ -319,7 +319,7 @@ void displayDirectional() {
     mat4x4 scale;
     mat4x4 translate;
     mat4x4_identity(scale);
-    mat4x4_scale_aniso(scale, scale, 0.1f, 0.1f, 0.1f);;
+    mat4x4_scale_aniso(scale, scale, 0.5f, 0.5f, 0.5f);
     mat4x4 modelMatrix;
     float* positions = myParticleSystem.getPositions();
     int nbrParticles = myParticleSystem.getNumberOfParticles();
