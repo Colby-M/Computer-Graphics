@@ -13,13 +13,13 @@ include_directories(glfw/include)
 include_directories(passthrough.frag)
 include_directories(passthrough.vert)
 
-set(SOURCE_FILES Project22022.cpp)
+set(SOURCE_FILES Project32022.cpp)
 
 add_executable(Computer_Graphics
         glad/glad.c
         LoadShaders.cpp
         objReader.cpp
-        Project22022.cpp
+        Project32022.cpp
         Particles.cpp
         )
 # Linking GLFW
