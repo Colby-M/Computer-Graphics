@@ -10,17 +10,17 @@ add_subdirectory(glfw)
 include_directories(glfw/include)
 
 
-include_directories(passthrough.frag)
-include_directories(passthrough.vert)
+include_directories(texture.frag)
+include_directories(texture.vert)
 
-set(SOURCE_FILES Project32022.cpp)
+set(SOURCE_FILES Project42022.cpp)
 
 add_executable(Computer_Graphics
         glad/glad.c
         LoadShaders.cpp
         objReader.cpp
-        Project32022.cpp
-        Particles.cpp
+        Project42022.cpp
+        linmath.h
         )
 # Linking GLFW
 target_link_libraries(Computer_Graphics glfw)
