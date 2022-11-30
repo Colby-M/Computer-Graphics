@@ -371,7 +371,6 @@ void buildAndSetupTextures()
 		glBindTexture(GL_TEXTURE_2D, textureID[i]);
 		//glTexStorage2D(GL_TEXTURE_2D, 9, GL_RGB8, 256, 256);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  // No padding between pixels/rows
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -392,10 +391,8 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	glUseProgram(programID);
-	//glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
-    GLuint colorLoc = glGetUniformLocation(programID, "Color");
-    GLfloat Color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // color to draw with -- currently white
-    glUniform4fv(colorLoc, 1, Color);
+	glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
+	GLuint texLocation = glGetUniformLocation(programID, "tex");
 
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 //	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat *)rotation);
@@ -404,13 +401,12 @@ void display() {
 //	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles * 3);
 	mat4x4 scaling, teapotModelingMatrix;
 	mat4x4_identity(scaling);
-	mat4x4_scale_aniso(scaling, scaling, 1.0f / 14.0f, 1.0f / 14.0f, 1.0f / 14.0f);
+	mat4x4_scale_aniso(scaling, scaling, 1.0f / 12.0f, 1.0f / 12.0f, 1.0f / 12.0f);
 	mat4x4_mul(teapotModelingMatrix, rotation, scaling);
-
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)teapotModelingMatrix);
 	glBindVertexArray(teapotVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotBAO);
-	glDrawArrays(GL_TRIANGLES, 0, teapotTriangles * 3);
+	glDrawArrays(GL_TRIANGLES, 0, teapotTriangles*3);
 
 }
 
