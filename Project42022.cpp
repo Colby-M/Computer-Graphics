@@ -391,8 +391,10 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	glUseProgram(programID);
-	glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
-	GLuint texLocation = glGetUniformLocation(programID, "tex");
+
+    glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
+    GLuint texLocation = glGetUniformLocation(programID, "tex");
+    glUniform1i(texLocation, 0);
 
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 //	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat *)rotation);
