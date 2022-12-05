@@ -39,8 +39,8 @@ mat4x4 rotation;
 map<string, GLuint> locationMap;
 GLuint textureID[4];
 GLuint currentTextureMap = 0;
-GLuint teapotVAO, teapotBAO;
-int teapotTriangles;
+GLuint teapotVAO, teapotBAO, sphereVAO, sphereBAO, cubeVAO, cubeBAO;
+int teapotTriangles, sphereTriangles, cubeTriangles;
 // Prototypes
 GLuint buildProgram(string vertexShaderName, string fragmentShaderName);
 GLFWwindow * glfwStartUp(int& argCount, char* argValues[],
@@ -167,89 +167,14 @@ void setAttributes(float lineWidth, GLenum face, GLenum fill) {
  */
 
 void buildObjects() {
+    // constants
+    const int VERTICES_PER_TRIANGLE = 3;
+    const int FLOATS_PER_VERTEX   = 4;
+    const int FLOATS_PER_NORMAL   = 3;
+    const int FLOATS_PER_TEXCOORD = 2;
+    const int BYTES_PER_FLOAT     = 4;
 
-	GLfloat vertices[] = {
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f, -0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f, -0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f,  0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f,  0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f,  0.5f,  0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,
-						0.5f,  0.5f,  0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,
-						0.5f, -0.5f,  0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,
-						0.5f, -0.5f,  0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f
-	};
-
-	GLfloat colors[] = {
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 1.0f, 1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
-							1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-							1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
-							1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f
-	};
-	GLfloat cubeTextureCoordinates[] = { 0.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-										 0.0f, 1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
-		                                 3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f,  // back
-		                                 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 3.0f,
-	                                     0.0f, 0.0f,  0.0f, 1.0f, 1.0f, 1.0f, // bottom
-	                                     0.0f, 0.0f,  0.0f, 1.0f, 1.0f, 1.0f,
-		                                 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // Front
-		                                 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-										 0.0f, 0.0f,  0.0f, 2.0f, 2.0f, 2.0f,
-										 0.0f, 0.0f,  0.0f, 2.0f, 2.0f, 2.0f,   // top -- pt1
-										 0.0f, 2.0f, 2.0f, 2.0f, 2.0f, 0.0f,
-										 0.0f, 2.0f, 2.0f, 0.0f, 0.0f, 0.0f    // top -- pt2
-	};
-
-	glGenVertexArrays(1, vertexBuffers);
-	glBindVertexArray(vertexBuffers[0]);
-
-	// Alternately...
-	// GLuint   vaoID;
-	// glGenVertexArrays(1, &vaoID);
-	// glBindVertexArray(vaoID);
-	//
-
-/*
- * Test code for internal object.
- */
-	nbrTriangles = 12;
-	glGenBuffers(1, &(arrayBuffers[0]));
-	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vertices) + sizeof(colors) + sizeof(cubeTextureCoordinates),
-		NULL, GL_STATIC_DRAW);
-	//                               offset in bytes   size in bytes     ptr to data
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(colors), sizeof(cubeTextureCoordinates), cubeTextureCoordinates);
-	/*
-	 * Set up variables into the shader programs (Note:  We need the
-	 * shaders loaded and built into a program before we do this)
-	 */
-	GLuint vPosition = glGetAttribLocation(programID, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-
-	GLuint vColor = glGetAttribLocation(programID, "vColor");
-	glEnableVertexAttribArray(vColor);
-	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
-		BUFFER_OFFSET(sizeof(vertices)));
-
-	GLuint vTexture = glGetAttribLocation(programID, "vTexture");
-	glEnableVertexAttribArray(vTexture);
-	glVertexAttribPointer(vTexture, 2, GL_FLOAT, GL_FALSE, 0,
-		BUFFER_OFFSET(sizeof(vertices) + sizeof(colors)));
+    // Teapot
 	float* teapotNormals, *teapotTextures;
 	float *teapotVertices = readOBJFile("teapot.obj", teapotTriangles, teapotNormals, teapotTextures);
 	// Print info
@@ -258,11 +183,7 @@ void buildObjects() {
 	glBindVertexArray(teapotVAO);
 	glGenBuffers(1, &teapotBAO);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotBAO);
-	const int VERTICES_PER_TRIANGLE = 3;
-	const int FLOATS_PER_VERTEX   = 4;
-	const int FLOATS_PER_NORMAL   = 3;
-	const int FLOATS_PER_TEXCOORD = 2;
-	const int BYTES_PER_FLOAT     = 4;
+
 	glBufferData(GL_ARRAY_BUFFER,
 		teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT +
 		teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT +
@@ -273,7 +194,7 @@ void buildObjects() {
 	glBufferSubData(GL_ARRAY_BUFFER, teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT, teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, teapotNormals);
 	glBufferSubData(GL_ARRAY_BUFFER, teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT + teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT, teapotTextures);
 
-	vPosition = glGetAttribLocation(programID, "vPosition");
+	GLuint vPosition = glGetAttribLocation(programID, "vPosition");
 	glEnableVertexAttribArray(vPosition);
 	glVertexAttribPointer(vPosition, FLOATS_PER_VERTEX, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
@@ -282,10 +203,78 @@ void buildObjects() {
 	glVertexAttribPointer(vNormal, FLOATS_PER_NORMAL, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT));
 
-	vTexture = glGetAttribLocation(programID, "vTexture");
+	GLuint vTexture = glGetAttribLocation(programID, "vTexture");
 	glEnableVertexAttribArray(vTexture);
 	glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT+teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
+
+    // Sphere
+    float* sphereNormals, *sphereTextures;
+    float *sphereVertices = readOBJFile("sphere001.obj", sphereTriangles, sphereNormals, sphereTextures);
+    // Print info`
+    cout << sphereTriangles << endl;
+    glGenVertexArrays(1, &sphereVAO);
+    glBindVertexArray(sphereVAO);
+    glGenBuffers(1, &sphereBAO);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereBAO);
+
+    glBufferData(GL_ARRAY_BUFFER,
+                 sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT +
+                 sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT +
+                 sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT,
+                 NULL, GL_STATIC_DRAW);
+    //                               offset in bytes   size in bytes     ptr to data
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT, sphereVertices);
+    glBufferSubData(GL_ARRAY_BUFFER, sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT, sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, sphereNormals);
+    glBufferSubData(GL_ARRAY_BUFFER, sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT + sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT, sphereTextures);
+
+    vPosition = glGetAttribLocation(programID, "vPosition");
+    glEnableVertexAttribArray(vPosition);
+    glVertexAttribPointer(vPosition, FLOATS_PER_VERTEX, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+    vNormal = glGetAttribLocation(programID, "vNormal");
+    glEnableVertexAttribArray(vNormal);
+    glVertexAttribPointer(vNormal, FLOATS_PER_NORMAL, GL_FLOAT, GL_FALSE, 0,
+                          BUFFER_OFFSET(sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT));
+
+    vTexture = glGetAttribLocation(programID, "vTexture");
+    glEnableVertexAttribArray(vTexture);
+    glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
+                          BUFFER_OFFSET(sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT+sphereTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
+
+    // Cube
+    float* cubeNormals, *cubeTextures;
+    float *cubeVertices = readOBJFile("cube001.obj", cubeTriangles, cubeNormals, cubeTextures);
+    // Print info`
+    cout << cubeTriangles << endl;
+    glGenVertexArrays(1, &cubeVAO);
+    glBindVertexArray(cubeVAO);
+    glGenBuffers(1, &cubeBAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
+
+    glBufferData(GL_ARRAY_BUFFER,
+                 cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT +
+                 cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT +
+                 cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT,
+                 NULL, GL_STATIC_DRAW);
+    //                               offset in bytes   size in bytes     ptr to data
+    glBufferSubData(GL_ARRAY_BUFFER, 0, cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT, cubeVertices);
+    glBufferSubData(GL_ARRAY_BUFFER, cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT, cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, cubeNormals);
+    glBufferSubData(GL_ARRAY_BUFFER, cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT + cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT, cubeTextures);
+
+    vPosition = glGetAttribLocation(programID, "vPosition");
+    glEnableVertexAttribArray(vPosition);
+    glVertexAttribPointer(vPosition, FLOATS_PER_VERTEX, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+    vNormal = glGetAttribLocation(programID, "vNormal");
+    glEnableVertexAttribArray(vNormal);
+    glVertexAttribPointer(vNormal, FLOATS_PER_NORMAL, GL_FLOAT, GL_FALSE, 0,
+                          BUFFER_OFFSET(cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT));
+
+    vTexture = glGetAttribLocation(programID, "vTexture");
+    glEnableVertexAttribArray(vTexture);
+    glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
+                          BUFFER_OFFSET(cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT+cubeTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
 }
 
 /*
@@ -366,21 +355,26 @@ void buildAndSetupTextures()
 	unsigned char* imageData;
 	glGenTextures(4, textureID);
 	for (int i = 0; i < 4; i++) {
-		imageData = getImageFromFile(filenames[i], 256, 256);
-
-		glBindTexture(GL_TEXTURE_2D, textureID[i]);
-		//glTexStorage2D(GL_TEXTURE_2D, 9, GL_RGB8, 256, 256);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  // No padding between pixels/rows
+        glBindTexture(GL_TEXTURE_2D, textureID[i]);
+        // set the texture wrapping/filtering options (on the currently bound texture object)
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  // No padding between pixels/rows
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		//		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glEnable(GL_TEXTURE_2D);
-		free(imageData);
+        // load and generate the texture
+        unsigned char *data = getImageFromFile(filenames[i], 256, 256);
+        if (data) // check if the texture got loaded or not
+        {
+            // create the texture with the data
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else
+        {
+            std::cout << "Failed to load texture" << std::endl;
+        }
+        free(data);
 	}
 }
 
@@ -391,24 +385,40 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	glUseProgram(programID);
-
     glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
-    GLuint texLocation = glGetUniformLocation(programID, "tex");
-    glUniform1i(texLocation, 0);
 
+    GLuint texLocation = glGetUniformLocation(programID, "tex");
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 //	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat *)rotation);
 //	glBindVertexArray(vertexBuffers[0]);
 //	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
 //	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles * 3);
-	mat4x4 scaling, teapotModelingMatrix;
+	mat4x4 scaling, teapotModelingMatrix, cubeModelingMatrix, sphereModelingMatrix, translate;
+
 	mat4x4_identity(scaling);
-	mat4x4_scale_aniso(scaling, scaling, 1.0f / 12.0f, 1.0f / 12.0f, 1.0f / 12.0f);
+	mat4x4_scale_aniso(scaling, scaling, 1.0f / 20.0f, 1.0f / 20.0f, 1.0f / 20.0f);
+    mat4x4_translate(teapotModelingMatrix, 0,1,0);
 	mat4x4_mul(teapotModelingMatrix, rotation, scaling);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)teapotModelingMatrix);
 	glBindVertexArray(teapotVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotBAO);
 	glDrawArrays(GL_TRIANGLES, 0, teapotTriangles*3);
+
+//    mat4x4_identity(scaling);
+//    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
+//    mat4x4_mul(sphereModelingMatrix, rotation, scaling);
+//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)sphereModelingMatrix);
+//    glBindVertexArray(cubeVAO);
+//    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
+//    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
+//
+//    mat4x4_identity(scaling);
+//    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
+//    mat4x4_mul(cubeModelingMatrix, rotation, scaling);
+//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cubeModelingMatrix);
+//    glBindVertexArray(cubeVAO);
+//    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
+//    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
 
 }
 
