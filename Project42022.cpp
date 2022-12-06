@@ -35,7 +35,7 @@ bool elements;
 int nbrTriangles, materialToUse = 0;
 int startTriangle = 0, endTriangle = 12;
 bool rotationOn = false;
-mat4x4 rotation;
+mat4x4 rotation, viewMatrix, projectionMatrix;
 map<string, GLuint> locationMap;
 GLuint textureID[4];
 GLuint currentTextureMap = 0;
@@ -68,12 +68,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, 0.31419);
-	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, -0.31419);
-	}
+	else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 5.0f, 0.0f, 0.0f }, vec3 {0.0f, 0.0f, 0.0f}, vec3 {0.0, 1.0f, 0.0f});
+    }
+    else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 0.0f, 10.0f, 0.0f }, vec3 {0.0f, 0.0f, 0.0f}, vec3 {0.0, 0.0f, -1.0f});
+    }
+    else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 0.0f, 0.0f, -5.0f }, vec3 {0.0f, 0.0f, 0.0f}, vec3 {0.0, 1.0f, 0.0f});
+    }
+    else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+        mat4x4_look_at(viewMatrix, vec3{ 5.0f, 2.0f, -5.0f }, vec3 {0.0f, 0.0f, 0.0f}, vec3 {0.0, 1.0f, 0.0f});
+    }
 	else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
 		currentTextureMap = 0;
 	}
@@ -336,6 +342,10 @@ void init(string vertexShader, string fragmentShader) {
 
 	programID = buildProgram(vertexShader, fragmentShader);
 	mat4x4_identity(rotation);
+    mat4x4_identity(viewMatrix);
+
+    mat4x4_look_at(viewMatrix, vec3{ 5.0f, 2.0f, -5.0f }, vec3 {0.0f, 0.0f, 0.0f}, vec3 {0.0, 1.0f, 0.0f});
+    mat4x4_perspective(projectionMatrix, M_PI_4, 1.0f, 0.01f, 100.0f);
 	buildObjects();
 	getLocations();
 
@@ -354,6 +364,8 @@ void buildAndSetupTextures()
 
 	unsigned char* imageData;
 	glGenTextures(4, textureID);
+    // using glTexImage instead of glTexSubImage
+    // not using glTextStorage2D
 	for (int i = 0; i < 4; i++) {
         glBindTexture(GL_TEXTURE_2D, textureID[i]);
         // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -385,6 +397,11 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	glUseProgram(programID);
+    GLuint viewMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+    glUniformMatrix4fv(viewMatrixLocation, 1, false, (const GLfloat*) viewMatrix);
+    GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+    glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*) projectionMatrix);
+
     glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
 
     GLuint texLocation = glGetUniformLocation(programID, "tex");
@@ -394,31 +411,49 @@ void display() {
 //	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
 //	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles * 3);
 	mat4x4 scaling, teapotModelingMatrix, cubeModelingMatrix, sphereModelingMatrix, translate;
-
+    // texture 1
+    glBindTexture(GL_TEXTURE_2D, textureID[0]);
 	mat4x4_identity(scaling);
 	mat4x4_scale_aniso(scaling, scaling, 1.0f / 20.0f, 1.0f / 20.0f, 1.0f / 20.0f);
-    mat4x4_translate(teapotModelingMatrix, 0,1,0);
 	mat4x4_mul(teapotModelingMatrix, rotation, scaling);
+    mat4x4_translate_in_place(teapotModelingMatrix, 20.0, 0.f, 20.0f);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)teapotModelingMatrix);
 	glBindVertexArray(teapotVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotBAO);
 	glDrawArrays(GL_TRIANGLES, 0, teapotTriangles*3);
 
-//    mat4x4_identity(scaling);
-//    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
-//    mat4x4_mul(sphereModelingMatrix, rotation, scaling);
-//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)sphereModelingMatrix);
-//    glBindVertexArray(cubeVAO);
-//    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
-//    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
-//
-//    mat4x4_identity(scaling);
-//    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
-//    mat4x4_mul(cubeModelingMatrix, rotation, scaling);
-//    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cubeModelingMatrix);
-//    glBindVertexArray(cubeVAO);
-//    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
-//    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
+    // texture 2
+    glBindTexture(GL_TEXTURE_2D, textureID[1]);
+    mat4x4_identity(scaling);
+    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
+    mat4x4_mul(sphereModelingMatrix, rotation, scaling);
+    mat4x4_translate_in_place(sphereModelingMatrix, 5.0f, 0.0f, -5.0f);
+    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)sphereModelingMatrix);
+    glBindVertexArray(sphereBAO);
+    glBindBuffer(GL_ARRAY_BUFFER, sphereVAO);
+    glDrawArrays(GL_TRIANGLES, 0, sphereTriangles * 3);
+
+    // texture 3
+    glBindTexture(GL_TEXTURE_2D, textureID[2]);
+    mat4x4_identity(scaling);
+    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
+    mat4x4_mul(cubeModelingMatrix, rotation, scaling);
+    mat4x4_translate_in_place(cubeModelingMatrix, -5.0f, 0.0f, -5.0f);
+    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cubeModelingMatrix);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
+    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
+
+    // texture 4
+    glBindTexture(GL_TEXTURE_2D, textureID[3]);
+    mat4x4_identity(scaling);
+    mat4x4_scale_aniso(scaling, scaling, 1.0f / 5.0f, 1.0f / 5.0f, 1.0f / 5.0f);
+    mat4x4_mul(cubeModelingMatrix, rotation, scaling);
+    mat4x4_translate_in_place(cubeModelingMatrix, -5.0f, 0.0f, 5.0f);
+    glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cubeModelingMatrix);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeBAO);
+    glDrawArrays(GL_TRIANGLES, 0, cubeTriangles * 3);
 
 }
 
@@ -439,7 +474,7 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
 	GLFWwindow* window = nullptr;
-	window = glfwStartUp(argCount, argValues, "My Test of New Routines");
+	window = glfwStartUp(argCount, argValues, "Textures on Objects");
 	init("texture.vert", "texture.frag");
 	glfwSetWindowSizeCallback(window, reshapeWindow);
 
