@@ -23,5 +23,5 @@ void main()
 	Color    = vColor;
 	TexCoord = vTexture;
 	Normal   = vNormal;
-    gl_Position = modelingMatrix * vPosition;
+    gl_Position = projectionMatrix * viewingMatrix * modelingMatrix * vPosition;
 }
